@@ -65,11 +65,11 @@ const Game = ({ levelData, replay }: GameProps) => {
   }
 
   const setup = (p5: p5Type, canvasParentRef: Element): void => {
+    p5.frameRate(60)
     p5.createCanvas(width, height).parent(canvasParentRef)
   }
 
   const draw = (p5: p5Type): Promise<void> => {
-
     p5.background(styles.general.backgroundColor)
 
     if (!level?.enemies || !level.areas) return
