@@ -12,6 +12,12 @@ const getHighscores_Prisma = async (lid: number | string): Promise<Highscore[]> 
     where: {
       levelId: Number(lid)
     },
+    orderBy: [
+      {
+        length: 'asc',
+      },
+    ],
+    take: 10,
     include: {
       author: {
         select: {
@@ -21,9 +27,7 @@ const getHighscores_Prisma = async (lid: number | string): Promise<Highscore[]> 
     },
   });
   const json = JSON.parse(JSON.stringify(notes))
-  return json.sort((a, b) => {
-    return +new Date(b.createdAt) - +new Date(a.createdAt)
-  })
+  return json
 }
 
 export default async function handle(req, res) {
