@@ -2,10 +2,11 @@ import { Replay } from '.prisma/client'
 import { ReplayData } from '../../../components/Game'
 import prisma from '../../../lib/prisma'
 
-const saveReplay_Prisma = async (replayInstructions: string, levelId: number | string, authorId: number | string) => {
+const saveReplay_Prisma = async (replayInstructions: string, length: number | string, levelId: number | string, authorId: number | string) => {
   const res = await prisma.replay.create({
     data: {
       replayInstructions,
+      length: Number(length),
       levelId: Number(levelId),
       authorId: Number(authorId),
     },
@@ -15,14 +16,15 @@ const saveReplay_Prisma = async (replayInstructions: string, levelId: number | s
 
 export default async function handle(req, res) {
   if (req.method === 'POST') {
-    const { replayInstructions, levelId, authorId } = req.body;
-    const result = await saveReplay_Prisma(replayInstructions, levelId, authorId)
+    const { replayInstructions, length, levelId, authorId } = req.body;
+    const result = await saveReplay_Prisma(replayInstructions, length, levelId, authorId)
     res.json(result)
   }
 }
 
 export const saveReplay = async (
   replayInstructions: ReplayData[],
+  length: number | string,
   levelId: number | string,
   authorId: number | string,
 ) => {
@@ -32,6 +34,7 @@ export const saveReplay = async (
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         replayInstructions,
+        length,
         levelId,
         authorId,
       })

@@ -464,7 +464,7 @@ const Game = ({ levelData, replay }: GameProps) => {
         console.log(player)
 
         if (!replayMode && replayData.length) {
-          saveReplay(replayData, 1, levelData.id)
+          saveReplay(replayData, replayData.length, 1, levelData.id)
         }
       }
 

@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router'
 import { useAsync } from 'react-async-hook'
 import Game from '../../components/Game'
-import { getLevel } from '../../lib/fetch'
 import styles from '../../styles/Home.module.css'
+import { getLevel } from '../api/levels/[lid]'
 import { getReplay } from '../api/replays/[rid]'
 
 export default function Replay() {
