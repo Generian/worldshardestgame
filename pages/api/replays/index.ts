@@ -5,7 +5,7 @@ import prisma from '../../../lib/prisma'
 const saveReplay_Prisma = async (replayInstructions: string, length: number | string, levelId: number | string, authorId: number | string) => {
   const res = await prisma.replay.create({
     data: {
-      replayInstructions: replayInstructions,
+      replayInstructions,
       length: Number(length),
       levelId: Number(levelId),
       authorId: Number(authorId),

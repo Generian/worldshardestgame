@@ -12,11 +12,11 @@ const getHighscores_Prisma = async (lid: number | string): Promise<Highscore[]> 
     where: {
       levelId: Number(lid)
     },
-    // orderBy: [
-    //   {
-    //     length: 'asc',
-    //   },
-    // ],
+    orderBy: [
+      {
+        length: 'asc',
+      },
+    ],
     take: 10,
     include: {
       author: {
