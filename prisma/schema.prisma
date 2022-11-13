@@ -16,6 +16,8 @@ model User {
   name  String?
   levels Level[]
   replays Replay[]
+  collections Collection[]
+  collectionReplays CollectionReplay[]
 }
 
 model Level {
@@ -25,7 +27,8 @@ model Level {
   published Boolean @default(false)
   author    User    @relation(fields: [authorId], references: [id])
   authorId  Int
-  replays Replay[]
+  replays   Replay[]
+  collections LevelsOnCollection[]
 }
 
 model Replay {
@@ -36,5 +39,34 @@ model Replay {
   author    User    @relation(fields: [authorId], references: [id])
   authorId  Int
   level     Level   @relation(fields: [levelId], references: [id])
-  levelId  Int
+  levelId   Int
+}
+
+model Collection {
+  id        Int     @id @default(autoincrement())
+  title     String
+  levels    LevelsOnCollection[]
+  published Boolean @default(false)
+  author    User    @relation(fields: [authorId], references: [id])
+  authorId  Int
+  collectionReplays CollectionReplay[]
+}
+
+model LevelsOnCollection {
+  level     Level  @relation(fields: [levelId], references: [id])
+  levelId   Int
+  collection     Collection  @relation(fields: [collectionId], references: [id])
+  collectionId   Int
+  assignedAt DateTime @default(now())
+
+  @@id([levelId, collectionId])
+}
+
+model CollectionReplay {
+  id        Int     @id @default(autoincrement())
+  deaths    Int
+  collection Collection  @relation(fields: [collectionId], references: [id])
+  collectionId  Int
+  author    User    @relation(fields: [authorId], references: [id])
+  authorId  Int
 }

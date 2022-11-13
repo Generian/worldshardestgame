@@ -1,4 +1,4 @@
-export const styles = {
+export const gameStyles = {
   player: {
     size: 30,
     fillColor: '#f00',

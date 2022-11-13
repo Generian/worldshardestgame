@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
+import React, { Dispatch, SetStateAction, useState } from 'react'
 import dynamic from 'next/dynamic'
 import type p5Type from 'p5'
-import useWindowDimensions from './game/helper/useWindowDimensions';
 import { arePlayerAndEnemyColliding } from './game/helper/geoHelpers';
-import { styles } from './game/helper/styling';
+import { gameStyles } from './game/helper/styling';
+import styles from '../styles/Game.module.css'
 import { Level, Replay } from '@prisma/client';
 import { SetupInstructions } from './game/helper/levelData';
 import { saveReplay } from '../pages/api/replays';
@@ -27,9 +27,19 @@ export interface ReplayData {
 interface GameProps {
   levelData: Level
   replay?: Replay
+  buildMode?: boolean
+  setDeaths?: Dispatch<SetStateAction<number>>
+  handleLevelComplete?: () => void
 }
 
-const Game = ({ levelData, replay }: GameProps) => {
+const Game = ({ levelData, replay, buildMode = false, setDeaths, handleLevelComplete }: GameProps) => {
+
+  if (!levelData) {
+    return (
+      <div className={styles.gameContainer}>
+      </div>
+    )
+  }
 
   // Development mode
   let debugMode = false
@@ -70,7 +80,7 @@ const Game = ({ levelData, replay }: GameProps) => {
   }
 
   const draw = (p5: p5Type): Promise<void> => {
-    p5.background(styles.general.backgroundColor)
+    p5.background(gameStyles.general.backgroundColor)
 
     if (!level?.enemies || !level.areas) return
 
@@ -82,7 +92,7 @@ const Game = ({ levelData, replay }: GameProps) => {
       constructor(x: number, y: number) {
         this.x = x
         this.y = y
-        this.d = styles.player.size
+        this.d = gameStyles.player.size
       }
 
       cornerInside(
@@ -278,10 +288,10 @@ const Game = ({ levelData, replay }: GameProps) => {
 
       show() {
         p5.rectMode(p5.CENTER)
-        p5.fill(styles.player.strokeColor)
+        p5.fill(gameStyles.player.strokeColor)
         p5.rect(this.x, this.y, this.d, this.d)
-        p5.fill(styles.player.fillColor)
-        p5.rect(this.x, this.y, this.d - 2*styles.player.strokeWeight, this.d - 2*styles.player.strokeWeight)
+        p5.fill(gameStyles.player.fillColor)
+        p5.rect(this.x, this.y, this.d - 2*gameStyles.player.strokeWeight, this.d - 2*gameStyles.player.strokeWeight)
       }
     }
 
@@ -344,13 +354,13 @@ const Game = ({ levelData, replay }: GameProps) => {
       show() {
         if (this.isTouched) {
           p5.strokeWeight(1);
-          p5.stroke(styles.area.strokeColor);
+          p5.stroke(gameStyles.area.strokeColor);
         } else {
           p5.noStroke();
         }
         p5.fill(this.isStart || this.isExit ? 
-          styles.area.startAndExitBackgroundColor : 
-          styles.area.defaultBackgroundColor)
+          gameStyles.area.startAndExitBackgroundColor : 
+          gameStyles.area.defaultBackgroundColor)
         p5.rectMode(p5.CORNER)
         p5.rect(this.x, this.y, this.width, this.height)
       }
@@ -374,7 +384,7 @@ const Game = ({ levelData, replay }: GameProps) => {
       ) {
         this.x = x
         this.y = y
-        this.r = styles.enemy.radius
+        this.r = gameStyles.enemy.radius
         this.movementType = movementType
         this.speed = speed
         this.cycleLength = cycleLength
@@ -410,10 +420,10 @@ const Game = ({ levelData, replay }: GameProps) => {
 
       show() {
         p5.noStroke()
-        p5.fill(styles.enemy.strokeColor)
+        p5.fill(gameStyles.enemy.strokeColor)
         p5.circle(this.x, this.y, this.r * 2)
-        p5.fill(styles.enemy.fillColor)
-        p5.circle(this.x, this.y, this.r * 2 - styles.enemy.strokeWeight * 2)
+        p5.fill(gameStyles.enemy.fillColor)
+        p5.circle(this.x, this.y, this.r * 2 - gameStyles.enemy.strokeWeight * 2)
       }
     }
 
@@ -461,10 +471,12 @@ const Game = ({ levelData, replay }: GameProps) => {
       if (!gameOver && exitArea.playerInside(player)) {
 
         gameOver = true
-        console.log(player)
 
         if (!replayMode && replayData.length) {
-          saveReplay(replayData, replayData.length, 1, levelData.id)
+          saveReplay(replayData, replayData.length, levelData.id, 1)
+        }
+        if (handleLevelComplete) {
+          handleLevelComplete()
         }
       }
 
@@ -500,15 +512,20 @@ const Game = ({ levelData, replay }: GameProps) => {
     enemies = []
     gameOver = false
     replayData = []
+    !replayMode && !buildMode && setDeaths(d => d + 1)
   }
 
 
-  return <Sketch
-    preload={preload}
-    setup={setup}
-    draw={draw}
-    keyPressed={keyPressed}
-  />
+  return (
+    <div className={styles.gameContainer}>
+      <Sketch
+        preload={preload}
+        setup={setup}
+        draw={draw}
+        keyPressed={keyPressed}
+      />
+    </div>
+  )
 }
 
 export default Game
