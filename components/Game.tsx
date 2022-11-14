@@ -7,6 +7,7 @@ import styles from '../styles/Game.module.css'
 import { Level, Replay } from '@prisma/client';
 import { SetupInstructions } from './game/helper/levelData';
 import { saveReplay } from '../pages/api/replays';
+import { LinearProgress } from '@mui/material';
 
 interface Coords {
   x: number
@@ -37,6 +38,7 @@ const Game = ({ levelData, replay, buildMode = false, setDeaths, handleLevelComp
   if (!levelData) {
     return (
       <div className={styles.gameContainer}>
+        <LinearProgress />
       </div>
     )
   }

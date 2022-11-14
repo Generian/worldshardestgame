@@ -27,6 +27,11 @@ export default function Home() {
                 />
               )
             })}
+            {!collections.result && [1, 2, 3].map(e => {
+              return (
+                <CollectionCard key={e} />
+              )
+            })}
           </div>
         </div>
         <div>
@@ -39,6 +44,11 @@ export default function Home() {
                 <LevelCard
                   level={level}
                 />
+              )
+            })}
+            {!levels.result && [1, 2, 3].map(e => {
+              return (
+                <LevelCard key={e} />
               )
             })}
           </div>
