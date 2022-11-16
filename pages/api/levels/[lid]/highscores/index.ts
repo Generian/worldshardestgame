@@ -7,7 +7,7 @@ export type Highscore = (Replay & {
   };
 })
 
-const getHighscores_Prisma = async (lid: number | string): Promise<Highscore[]> => {
+const getHighscores_Prisma = async (lid: number | string, limit: number | string = 10): Promise<Highscore[]> => {
   const notes = await prisma.replay.findMany({
     where: {
       levelId: Number(lid)
@@ -17,7 +17,7 @@ const getHighscores_Prisma = async (lid: number | string): Promise<Highscore[]> 
         length: 'asc',
       },
     ],
-    take: 10,
+    take: Number(limit),
     include: {
       author: {
         select: {
@@ -31,17 +31,17 @@ const getHighscores_Prisma = async (lid: number | string): Promise<Highscore[]> 
 }
 
 export default async function handle(req, res) {
-  const { lid } = req.query
+  const { lid, limit } = req.query
   if (req.method === 'GET') {
-    const data = await getHighscores_Prisma(lid)
+    const data = await getHighscores_Prisma(lid, limit)
     res.json(data)
   }
 }
 
-export const getHighscores = async (lid: number | string | string[]) => {
+export const getHighscores = async (lid: number | string | string[], limit?: number | string | string[]) => {
   if (!lid) return null
   try {
-    const response = await fetch(`/api/levels/${String(lid)}/highscores`, {
+    const response = await fetch(`/api/levels/${String(lid)}/highscores?limit=${limit}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     })

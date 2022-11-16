@@ -1,8 +1,22 @@
 import { Level } from '.prisma/client'
 import prisma from '../../../lib/prisma'
 
-const getLevels_Prisma = async (): Promise<Level[]> => {
-  const data = await prisma.level.findMany()
+export type LevelWithAuthor = (Level & {
+  author: {
+      name: string;
+  };
+})
+
+const getLevels_Prisma = async (): Promise<LevelWithAuthor[]> => {
+  const data = await prisma.level.findMany({
+    include: {
+      author: {
+        select: {
+          name: true
+        },
+      },
+    },
+  })
   const json = JSON.parse(JSON.stringify(data))
   return json
 }
@@ -34,7 +48,7 @@ export const getLevels = async () => {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     })
-    const data: Level[] = await response.json()
+    const data: LevelWithAuthor[] = await response.json()
     return data
   } catch (error) {
     console.error(error)
